@@ -1,25 +1,63 @@
 
 var Game = {
-	createNew : function() {
+	createNew : function(setting) {
 		var canvas = document.querySelector('#map')
-		canvas.width = 300
-		canvas.height = 300
 		var context = canvas.getContext('2d')
+		var interval
 		var g = {
-			width: canvas.width,
-			height: canvas.height,
+			canvas: canvas,
 			keyevents: [],
 			keystatus: [],
+			score: 0,
 		}
-		// 按键监听
+		// 设置canvas宽高
+		canvas.width = g.width = (setting.width || canvas.width)
+		canvas.height = g.height = (setting.height || canvas.height)
+
+		// 设置按键监听
 		g.addKeyEvent = function(key, callback) {
-			g.keyevents[key] = callback
+			if ( key && typeof callback === 'function' )
+				g.keyevents[key] = callback
 		}
 
 		g.drawImage = function(obj) {
 			context.drawImage(obj.image,obj.x,obj.y)
 		}
 
+		g.drawRects = function(obj) {
+			for ( var i = obj.body.length - 1; i >= 0; i-- ) {
+				var body = obj.body[i]
+				context.fillStyle = body.bg
+				context.fillRect(body.x,body.y,obj.width,obj.height)
+			}
+		}
+
+		g.drawRect = function(obj) {
+			context.fillStyle = obj.bg
+			context.fillRect(obj.x,obj.y,obj.width,obj.height)
+		}
+
+
+		g.stop = function() {
+			clearInterval(interval)
+		}
+
+		g.start = function() {
+			console.log('start')
+			interval = setInterval(function(){
+				context.clearRect(0,0,g.width,g.height)
+			  	g.draw()
+			  	g.update()
+
+				// 画边框
+			  	context.strokeRect(0, 0, g.width, g.height)
+
+			  	// 画分数
+			  	context.font = '15px serif';
+			  	context.fillText('分数: ' + g.score, 10, g.height - 20)
+
+			}, 1000/10)
+		}
 
 		// 注册游戏按键事件
 		window.addEventListener('keydown', function(e) {
@@ -29,23 +67,20 @@ var Game = {
 			g.keystatus[e.key] = false
 		})
 
+		// 监听按键
+		setInterval(function(){
+			//events
+			// 监听按键
+			for ( let key in g.keyevents ) {
+				if ( g.keystatus[key] ) {
+					g.keyevents[key]()
+				}
+			}
+		}, 1000/10)
 
 		g.draw = function(){}
 		g.update = function(){}
-
 		
-		setInterval(function(){
-			context.clearRect(0,0,g.width,g.height)
-
-			//events
-			// 取出注册了的键
-			// console.log(g.keyevents.keys())
-
-		  	g.draw()
-		  	g.update()
-
-		}, 1000/60)
-
 		return g
 	}
 }

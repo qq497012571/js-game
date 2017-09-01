@@ -2,42 +2,79 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>打砖块</title>
+	<title>贪吃蛇</title>
 </head>
 <style>
-	#map {
-		border: 1px solid gray;
-	}
 </style>
 <body>
-	<canvas id="map"></canvas>
+	<canvas id="map">
 	
+	</canvas>
+
 	<script src="../base.js"></script>
 	<script src="../game.js"></script>
-
+	<script src="food.js"></script>
+	<script src="snake.js"></script>
 	<script>
-	var game = Game.createNew()
-	// var paddle = Paddle.createNew()
+	var game = Game.createNew({width:800,height:400})
+	var snake = Snake.createNew()
+	var food = Food.createNew({xMax:800,yMax:400})
 
-	window.addEventListener('keydown', function(event){
-		var key = event.key
-		if (key == 'a') {
-			paddle.runLeft()
-		}
-		if (key == 'd') {
-			paddle.runRight()
-		}
+
+	// 注册按键
+	game.addKeyEvent('w', function(){
+		snake.runTop()
 	})
-
+	game.addKeyEvent('s', function(){
+		snake.runBottom()
+	})
 	game.addKeyEvent('a', function(){
-
+		snake.runLeft()
+	})
+	game.addKeyEvent('d', function(){
+		snake.runRight()
+	})
+	
+	game.addKeyEvent('k', function(){
+		game.start()
+	})
+	game.addKeyEvent('p', function(){
+		game.stop()
 	})
 
-	game.update = function () {}
 
 	game.draw = function() {
-		// game.drawImage()
+
+		game.drawRects(snake)
+
+		game.drawRect(food)
 	}
+
+
+	game.update = function () {
+		snake.move()
+
+
+		// 判断是否撞到地图
+		if ( snake.impact(game) ) {
+			game.stop()
+			alert('你挂了,按"f5"刷新页面即可')
+		}
+
+		// 判断是否吃到食物
+		if ( food.impact(snake) ) {
+			snake.addBody()
+			food.setup()
+			game.score += 100
+		}
+
+	}
+
+
+	game.start()
+
+	
+
 </script>
 </body>
 

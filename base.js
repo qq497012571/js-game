@@ -9,7 +9,7 @@ var Base = {
 			img.src = src
 			return img
 		}
-
+		
 		return b
 	}
 }
