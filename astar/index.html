@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>game - 1</title>
+	<style>
+		body{
+			margin: 0;
+			padding: 0;
+		}
+		#block {
+			margin: 0 auto;
+			width: 540px;
+			height: 540px;
+			border: 1px solid gray;
+		}
+		.grid {
+			border: 1px solid gray;
+			width:25px;
+			height:25px;
+			float: left;
+		}
+		#control {
+			margin: 0 auto;
+			width: 540px;
+		}
+		.green {
+			background-color: green
+		}
+		.red {
+			background-color: red
+		}
+		.black {
+			background-color: black
+		}
+
+	</style>
+</head>
+<body >
+	
+	<div id="control">
+		<div>
+			<label for="t0">设置起点</label>
+			<input id="t0" type="radio" style="width: 20px;height:20px" value="1" name="change" checked="">
+			<label for="t1">设置障碍物</label>
+			<input id="t1" type="radio" style="width: 20px;height:20px" value="2" name="change">
+
+			<select name="mode">
+				<option value="1">正向查找</option>
+				<option value="0">允许斜角查找</option>
+			</select>
+		</div>
+	</div>
+	<hr>
+	<div id="block">
+		
+	</div>
+	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+	<script src="../astar.js"></script>
+	<script>
+
+		function clearClass(color) {
+			$('.green').each(function(){
+				$(this).removeClass(color)
+			})
+		}
+		function setGrid(x,y,color) {
+			var flag = false
+			$('.grid').each(function(i,v){
+				if ($(this).attr('x') == x && $(this).attr('y') == y ) {
+					if ($(this).hasClass(color)) {
+						$(this).removeClass(color)
+						flag = false
+						return 
+					} else {
+						$(this).addClass(color)
+						flag = true
+						return 
+					}
+				}
+			})
+			return flag
+		}
+
+		$(function(){
+
+			// 去掉鼠标右键事件
+			document.oncontextmenu = function(e){
+               e.preventDefault();
+            };
+
+            alert('鼠标右键,点击空白方块即可寻路')
+
+			a = new Astar([
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			])
+			a.drawMap()
+
+			var startX
+			var startY
+			$('.grid').on('mousedown',function(e){
+				// 点击了左键
+				if (e.button == 0) {
+					var x = $(this).attr('x'),
+						y = $(this).attr('y'),
+						type = $('input[name=change]:checked').val();
+
+					// 设置起点
+					if ( type == 1 ) {
+						clearClass('green')
+						setGrid(x,y,'green')
+						startX = parseInt(x)
+						startY = parseInt(y)
+					}
+					// 设置障碍物
+					if ( type == 2 ) {
+						
+						if ( setGrid(x,y,'black') ) {
+							a.maps[y][x] = 1
+						} else {
+							a.maps[y][x] = 0
+						}
+
+					}
+				}
+
+				// 点击了右键
+				if ( e.button == 2 ) {
+					clearClass('green')
+					var sPoint = new Point(startX,startY),
+						ePoint = new Point($(this).attr('x'),$(this).attr('y')),
+						mode = $('select[name=mode]').val();
+
+					var list = a.serach(sPoint,ePoint,mode==0?false:true)
+
+					var intValId = setInterval(function(){
+
+						try {
+							var path = list.shift()
+							setGrid(path[0],path[1],'green')
+						} catch(e) {
+							clearInterval(intValId)
+						}
+						
+					}, 1000/60)
+				}
+			})
+
+		})
+	</script>
+</body>
+</html>
