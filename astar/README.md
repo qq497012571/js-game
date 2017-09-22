@@ -1,3 +1,4 @@
-# astar实现
+# astar实现算法实现
 
-## 要求支持ECMASCRIPT 6以上的浏览器
+> 主要代码在finder-astar.js
+> 直接运行astar/index.html查看演示效果
